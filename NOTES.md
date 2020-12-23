@@ -33,7 +33,7 @@ Cell -> Time spent by any employee on that project
 
 * Must be deploy ready without any hassle
 
-
+URLS have ratelimiter cannot request authentication token each time. Must save in env.
 APIs Needed
 1. Authentication (/auth, POST)
     Obtain auth token for a user
