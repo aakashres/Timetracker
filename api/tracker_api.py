@@ -1,5 +1,6 @@
 import requests
 from .utils import get_url
+from .exceptions import TrackerError, TrackerAuthError
 
 
 class TrackerAPIClient:
@@ -10,7 +11,7 @@ class TrackerAPIClient:
         """
         self._app_token = app_token
         if not auth_token and not (email and password):
-            print("Issueeeeeee")  # todo
+            raise ValueError("auth_token or (email, password) pair must be set")
         self._email = email
         self._password = password
         self._auth_token = auth_token
@@ -30,11 +31,9 @@ class TrackerAPIClient:
             print(response.json())
             self._auth_token = response.json()["user"]["auth_token"]
         elif response.status_code == 401:
-            # Auth error
-            pass
+            raise TrackerAuthError(response.json()["error"])
         else:
-            # Other issue
-            pass
+            raise TrackerError(response.json()["error"])
         return self._auth_token
 
     def _requests(self, method, url, params=None, headers=None, data=None, json=None, refresh_token=False):
@@ -75,15 +74,73 @@ class TrackerAPIClient:
         return result
 
     def get_organization(self):
+        """
+            Fetches Organization that user is associated with
+
+            :return list: list of organization user is associated with
+        """
         # result = self._requests("GET", get_url("organization"))
-        result = {'organizations': [{'id': 302192, 'name': 'rt-bot-191', 'last_activity': '2020-12-23T06:00:00Z'}]}s
+        result = {'organizations': [{'id': 302192, 'name': 'rt-bot-191', 'last_activity': '2020-12-23T06:00:00Z'}]}
         return result["organizations"]
 
-    def get_organization_activities(self):
-        pass
+    def get_organization_activities(self, from_, to_, organization_ids=None, project_ids=None, user_ids=None, offset=0):
+        """
+            Fetches organizational activities from start time to end time
 
-    def get_user_list(self):
-        pass
+            :params datetime from_: date to fetch activities starting from
+            :params datetime to_: date to fetch activities ending upto
+            :params list organization_ids: (optional) List of organization IDs
+            :params list project_ids: (optional) List of project IDs
+            :params list user_ids: (optional) List of user IDs
+            :params int offset: (optional) index of the first record returned
 
-    def get_project_list(self):
-        pass
+            :return list: list of activities within the organizations
+        """
+        params = {
+            "start_time": from_.isoformat(),
+            "stop_time": to_.isoformat(),
+            "offset": offset
+        }
+        if organization_ids:
+            params["organizations"] = ",".join(map(str, organization_ids))
+        if project_ids:
+            params["projects"] = ",".join(map(str, project_ids))
+        if user_ids:
+            params["users"] = ",".join(map(str, user_ids))
+        # result = self._requests("GET", get_url("activity"), params=params)
+        result = {'activities': [{'id': 1828571999, 'time_slot': '2020-12-22T04:50:00Z', 'starts_at': '2020-12-22T04:50:46Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 0, 'mouse': 7, 'overall': 7, 'tracked': 9, 'paid': False}, {'id': 1828882920, 'time_slot': '2020-12-22T07:00:00Z', 'starts_at': '2020-12-22T07:04:34Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 230, 'mouse': 99, 'overall': 286, 'tracked': 326, 'paid': False}, {'id': 1828882997, 'time_slot': '2020-12-22T07:10:00Z', 'starts_at': '2020-12-22T07:10:00Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 115, 'mouse': 39, 'overall': 140, 'tracked': 188, 'paid': False}, {'id': 1829311594, 'time_slot': '2020-12-22T09:50:00Z', 'starts_at': '2020-12-22T09:52:59Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 9, 'mouse': 33, 'overall': 38, 'tracked': 47, 'paid': False}, {'id': 1829323338, 'time_slot': '2020-12-22T09:50:00Z', 'starts_at': '2020-12-22T09:56:11Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 82, 'mouse': 49, 'overall': 110, 'tracked': 124, 'paid': False}, {'id': 1829326285, 'time_slot': '2020-12-22T09:50:00Z', 'starts_at': '2020-12-22T09:59:12Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 7, 'mouse': 12, 'overall': 17, 'tracked': 19, 'paid': False}, {'id': 1829343255, 'time_slot': '2020-12-22T10:00:00Z', 'starts_at': '2020-12-22T10:02:27Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 67, 'mouse': 74, 'overall': 125, 'tracked': 146, 'paid': False}, {'id': 1829348185, 'time_slot': '2020-12-22T10:00:00Z', 'starts_at': '2020-12-22T10:06:19Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 16, 'mouse': 7, 'overall': 22, 'tracked': 24, 'paid': False}, {'id': 1829381523, 'time_slot': '2020-12-22T10:00:00Z', 'starts_at': '2020-12-22T10:07:58Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 23, 'mouse': 84, 'overall': 105, 'tracked': 122, 'paid': False}, {'id': 1829383204, 'time_slot': '2020-12-22T10:10:00Z', 'starts_at': '2020-12-22T10:10:00Z', 'user_id': 1058189, 'project_id': 1312778, 'task_id': None, 'keyboard': 291, 'mouse': 344, 'overall': 509, 'tracked': 583, 'paid': False}]}
+        return result
+
+    def get_user_list(self, organization_id, include_removed=False, offset=0):
+        """
+            Fetches user of an organization
+
+            :params int organization_id: any organization's id
+            :params bool include_removed: (optional) Include users that are removed from the organization
+            :params int offset: (optional) index of the first record returned
+
+            :return list: list of  user is associated with any organization
+        """
+        params = {
+            "include_removed": include_removed,
+            "offset": offset
+        }
+        # result = self._requests("GET", get_url("user", organization_id), params=params)
+        result = {'users': [{'id': 1058189, 'name': 'Aakash Shrestha', 'last_activity': '2020-12-23T09:50:00Z', 'email': 'aakash.shres@gmail.com', 'membership_status': 'active'}, {'id': 770062, 'name': 'Agata Gąsiorowska', 'last_activity': '2020-10-25T03:30:00Z', 'email': 'agata.gasiorowska@reef.pl', 'membership_status': 'active'}, {'id': 196435, 'name': 'Paweł Polewicz', 'last_activity': '2020-12-23T00:33:30Z', 'email': 'pawel.polewicz@reef.pl', 'membership_status': 'active'}]}
+        return result
+
+    def get_project_list(self, organization_id, offset=0):
+        """
+            Fetches user of an organization
+
+            :params int organization_id: any organization's id
+            :params int offset: (optional) index of the first record returned
+
+            :return list: list of projects is associated with any organization
+        """
+        params = {
+            "offset": offset
+        }
+        # result = self._requests("GET", get_url("project", organization_id), params=params)
+        result = {'projects': [{'id': 1312778, 'name': 'hubstaff bot191', 'last_activity': '2020-12-23T09:50:00Z', 'status': 'Active', 'description': None}, {'id': 1312779, 'name': 'Project A', 'last_activity': '2020-12-23T05:37:47Z', 'status': 'Active', 'description': None}, {'id': 1312780, 'name': 'Project B', 'last_activity': None, 'status': 'Active', 'description': None}]}
+        return result
