@@ -20,3 +20,5 @@ tracker = tracker_api.TrackerAPIClient(
     email=os.getenv("HUBSTAFF_EMAIL"),
     password=os.getenv("HUBSTAFF_PASSWORD")
 )
+
+print(tracker.get_organization())

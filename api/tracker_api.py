@@ -36,3 +36,54 @@ class TrackerAPIClient:
             # Other issue
             pass
         return self._auth_token
+
+    def _requests(self, method, url, params=None, headers=None, data=None, json=None, refresh_token=False):
+        """
+            Fetches desired data from hubstaff APIs
+
+            :param str method: rest API method: ``GET`` or ``POST`
+            :param str url: URL for the new request
+            :param dict params: (optional) query params
+            :param dict data: (optional) form data content
+            :param dict json: (optional) json data content
+            :param dict headers: additional header ``auth_token`` and ``app_token``
+            :param refresh_token headers: additionam header auth_token and app_token
+
+            :return list/dict : json data response
+        """
+        if not self._auth_token or refresh_token:
+            self.authenticate()
+
+        headers = headers.copy() if headers else {}
+        headers.update({
+            "App-Token": self._app_token,
+            "Auth-Token": self._auth_token,
+        })
+        response = requests.request(method, url, params=params, headers=headers, data=data, json=json)
+
+        if response.status_code == 401:
+            # false refresh_token denotes first execution. Token can expire. Ask for new in next execution
+            if not refresh_token:
+                return self._requests(method, url, params=params, headers=headers, data=data, json=json, refresh_token=True)
+            print("still issue")
+            return
+
+        result = response.json()
+        if "error" in result:
+            print(response["error"])
+            return []
+        return result
+
+    def get_organization(self):
+        # result = self._requests("GET", get_url("organization"))
+        result = {'organizations': [{'id': 302192, 'name': 'rt-bot-191', 'last_activity': '2020-12-23T06:00:00Z'}]}s
+        return result["organizations"]
+
+    def get_organization_activities(self):
+        pass
+
+    def get_user_list(self):
+        pass
+
+    def get_project_list(self):
+        pass
