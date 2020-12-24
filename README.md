@@ -28,3 +28,8 @@ HUBSTAFF_EMAIL=user@example.com
 HUBSTAFF_PASSWORD=my_passwrod_goes_here
 HUBSTAFF_APP_TOKEN=MYAPITOKENGOESHERE123
 ```
+
+Future extenstion in this script might be to feature to mail the generated output to someone. To enable this one must add additional config in ```.env``` file.
+```
+OUTPUT_MAIL_ADDRESS=sending_user@example.com
+```

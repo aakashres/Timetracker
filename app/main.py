@@ -143,7 +143,10 @@ def main():
         data = get_data(tracker)
         data = format_data(data)
         save_output(data)
-        # email_output() # TODO in future add function to send email
+        # if os.getenv("OUTPUT_MAIL_ADDRESS"):
+        #     # in near future, Option to send output in mail might be implemented
+        #     email_output(os.getenv("OUTPUT_MAIL_ADDRESS")) # TODO in future add function to send email
+
     except Exception as e:
         logging.error(e)
 
