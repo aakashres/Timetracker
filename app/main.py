@@ -69,7 +69,7 @@ def format_data(data):
     worked_time_data = {}
     for key, grp in groupby(sorted(data.get("activities"), key=grouper), grouper):
         worked_time_data["{}_{}".format(key[0], key[1])] = time.strftime("%H:%M:%S", time.gmtime(sum(item["tracked"] for item in grp)))
-    
+
     table_header = ["Projects_Users"] + [user_id_map.get(user_id) for user_id in user_ids]
     table_rows = []
     for project_id in project_ids:
@@ -118,25 +118,28 @@ def get_data(tracker):
 
 
 def main():
-    env_file = Path(__file__).resolve().parent.joinpath(".env")
-    load_dotenv()
-    if os.getenv("HUBSTAFF_AUTH_TOKEN"):
-        tracker = tracker_api.TrackerAPIClient(
-            app_token=os.getenv("HUBSTAFF_APP_TOKEN"),
-            auth_token=os.getenv("HUBSTAFF_AUTH_TOKEN"),
-            email=os.getenv("HUBSTAFF_EMAIL"),
-            password=os.getenv("HUBSTAFF_PASSWORD")
-        )
-    else:
-        tracker = tracker_api.TrackerAPIClient(
-            app_token=os.getenv("HUBSTAFF_APP_TOKEN"),
-            email=os.getenv("HUBSTAFF_EMAIL"),
-            password=os.getenv("HUBSTAFF_PASSWORD")
-        )
-        token = tracker.authenticate()
-        with env_file.open("a") as outfile:
-            outfile.write("\nHUBSTAFF_AUTH_TOKEN={}".format(token))
     try:
+        init_logging()
+        env_file = Path(__file__).resolve().parent.joinpath(".env")
+        load_dotenv()
+
+        if os.getenv("HUBSTAFF_AUTH_TOKEN"):
+            tracker = tracker_api.TrackerAPIClient(
+                app_token=os.getenv("HUBSTAFF_APP_TOKEN"),
+                auth_token=os.getenv("HUBSTAFF_AUTH_TOKEN"),
+                email=os.getenv("HUBSTAFF_EMAIL"),
+                password=os.getenv("HUBSTAFF_PASSWORD")
+            )
+        else:
+            tracker = tracker_api.TrackerAPIClient(
+                app_token=os.getenv("HUBSTAFF_APP_TOKEN"),
+                email=os.getenv("HUBSTAFF_EMAIL"),
+                password=os.getenv("HUBSTAFF_PASSWORD")
+            )
+            token = tracker.authenticate()
+            with env_file.open("a") as outfile:
+                outfile.write("\nHUBSTAFF_AUTH_TOKEN={}".format(token))
+
         data = get_data(tracker)
         data = format_data(data)
         save_output(data)
@@ -146,5 +149,4 @@ def main():
 
 
 if __name__ == "__main__":
-    init_logging()
     main()

@@ -9,9 +9,11 @@ class TrackerAPIClient:
         """
         Either auth token must be provided or email and password both
         """
+        if not app_token:
+            raise ValueError("app_token is must be set. Missing in env file")
         self._app_token = app_token
         if not auth_token and not (email and password):
-            raise ValueError("auth_token or (email, password) pair must be set")
+            raise ValueError("auth_token or (email, password) pair must be set. Missing in env file")
         self._email = email
         self._password = password
         self._auth_token = auth_token
