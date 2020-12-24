@@ -16,7 +16,7 @@ All necessary tokens and config are saved in ```.env``` file inside ```/app``` d
 2. Docker
     1. Navigate to project folder
     2. Create ```.env``` file inside ```/app``` (Contents example is listed below)
-    3. docker build -t <image_name> .
+    3. ```docker build -t <image_name> .```
     4. ```docker run -v $PWD/app:/app -it <image_name>```
     5. Output HTML is located in ```app/output/timesheet.html```
     6. Logs are located in ```app/logs/app.logs```
