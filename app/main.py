@@ -48,9 +48,9 @@ def format_data(data):
         Compiles data of user projects and activities to properly format it into tablular strucutre
         so that it can be rendered in HTML file
 
-        :params dict data: onsists of users, projects, activities, data_timestamp and organization name
+        :params dict data: consists of users, projects, activities, data_timestamp and organization name
 
-        :return dict data: onsists of List of user name,
+        :return dict data: consists of List of user name,
             List of project and time worked by user on them,
             Date of which data is fetched and Name of organization
             of which data is being prepared
