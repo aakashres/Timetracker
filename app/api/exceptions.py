@@ -1,5 +1,8 @@
 class TrackerError(Exception):
     """
+        Raises when API endpoint returns unexpected response format.
+
+        :param str message: (optional) custom error message
     """
 
     message = "API error"
