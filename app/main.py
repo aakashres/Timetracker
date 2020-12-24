@@ -12,7 +12,14 @@ from datetime import datetime, timedelta
 
 from api import tracker_api
 
-logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
+
+def init_logging():
+    """
+        Instantiates directory and log file
+    """
+    log_path = Path(__file__).resolve().parent.joinpath("logs")
+    log_path.mkdir(exist_ok=True)
+    logging.basicConfig(filename=log_path.joinpath("app.logs"), filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def save_output(data):
@@ -24,13 +31,15 @@ def save_output(data):
     """
     template_dir = Path(__file__).resolve().parent.joinpath("template")
     output_dir = Path(__file__).resolve().parent.joinpath("output")
-    if not os.path.exists(str(output_dir)):
-        os.mkdir(output_dir)
+    output_dir.mkdir(exist_ok=True)
+
     env = Environment(loader=FileSystemLoader(str(template_dir)))
     template = env.get_template("output_template.html")
+
     output = template.render(organization_name=data.get("org_name"), date=data.get("data_timestamp"), table_header=data.get("table_header"), table_rows=data.get("table_rows"))
     output_path = output_dir.joinpath("timesheet.html")
-    with open(output_path, "w") as outfile:
+
+    with output_path.open("w") as outfile:
         outfile.write(output)
 
 
@@ -48,16 +57,19 @@ def format_data(data):
     """
     user_id_map = {user["id"]: user["name"] for user in data.get("users")}
     project_id_map = {project["id"]: project["name"] for project in data.get("projects")}
+
     user_ids, project_ids = [], []
     for activity in data.get("activities"):
         if activity["user_id"] not in user_ids:
             user_ids.append(activity["user_id"])
         if activity["project_id"] not in project_ids:
             project_ids.append(activity["project_id"])
+
     grouper = itemgetter("project_id", "user_id")
     worked_time_data = {}
     for key, grp in groupby(sorted(data.get("activities"), key=grouper), grouper):
         worked_time_data["{}_{}".format(key[0], key[1])] = time.strftime("%H:%M:%S", time.gmtime(sum(item["tracked"] for item in grp)))
+    
     table_header = ["Projects_Users"] + [user_id_map.get(user_id) for user_id in user_ids]
     table_rows = []
     for project_id in project_ids:
@@ -66,6 +78,7 @@ def format_data(data):
         for user_id in user_ids:
             row.append(worked_time_data.get("{}_{}".format(project_id, user_id), "00:00:00"))
         table_rows.append(row)
+
     data = {
         "table_header": table_header,
         "table_rows": table_rows,
@@ -93,6 +106,7 @@ def get_data(tracker):
     users = tracker.get_user_list(org_id)
     projects = tracker.get_project_list(org_id)
     activities = tracker.get_organization_activities(start_time, stop_time, organization_ids=[org[0]["id"]])
+    
     data = {
         "users": users,
         "projects": projects,
@@ -104,6 +118,7 @@ def get_data(tracker):
 
 
 def main():
+    env_file = Path(__file__).resolve().parent.joinpath(".env")
     load_dotenv()
     if os.getenv("HUBSTAFF_AUTH_TOKEN"):
         tracker = tracker_api.TrackerAPIClient(
@@ -118,14 +133,18 @@ def main():
             email=os.getenv("HUBSTAFF_EMAIL"),
             password=os.getenv("HUBSTAFF_PASSWORD")
         )
-        os.environ["HUBSTAFF_AUTH_TOKEN"] = tracker.authenticate()
+        token = tracker.authenticate()
+        with env_file.open("a") as outfile:
+            outfile.write("\nHUBSTAFF_AUTH_TOKEN={}".format(token))
     try:
         data = get_data(tracker)
         data = format_data(data)
         save_output(data)
+        # email_output() # TODO in future add function to send email
     except Exception as e:
         logging.error(e)
 
 
 if __name__ == "__main__":
+    init_logging()
     main()
