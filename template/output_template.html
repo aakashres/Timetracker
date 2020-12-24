@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            Hubstaff active User/Project Daily timesheet
+        </title>
+        <style>
+            body {
+                font: normal medium/1.4 sans-serif;
+            }
+        
+            table {
+                border-collapse: collapse;
+                width: 100%;
+            }
+            th {
+                background-color: gray;
+            }
+            th,
+            td {
+                padding: 0.25rem;
+                text-align: left;
+                border: 2px solid #ccc;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>
+            {{organization_name}} Daily Timesheet
+        </h1>
+        <h3>
+            Timesheet date: {{date}}
+        </h3>
+        
+        <table>
+            <tr>
+                {% for header in table_header %}
+                    <th>{{header}}</th>
+                {% endfor %}
+            </tr>
+            {% for row in table_rows %}
+                <tr>
+                    {% for data in row %}
+                        <td>{{data}}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </body>
+</html>

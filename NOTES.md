@@ -4,7 +4,7 @@ In the columns, there should be the employees, in the rows, there should be the 
 
 The table should always be rendered for one day, which by default is yesterday. The output should be saved to a file. The configuration (such as the API key) should be read from a config file. A future extension may be for the program to send the table to a manager via email.
 
-It should be possible for a sysadmin to deploy the program on a server without reading its code or running any API queries manually.
+It should be possible for a sysadmin to ddoeploy the program on a server without reading its code or running any API queries manually.
 
 There are no hidden requirements. As we have already mentioned, if something was not specified, it means that we expect you to make a choice yourself using your best judgment. For example, we’re not telling you what external libraries or standard library classes you should or should not use.
 
@@ -25,13 +25,13 @@ Cell -> Time spent by any employee on that project
 
 * Data that is to be gathered is of yesterday. 
 
-* Output file must be saved.
+* Output file must be saved. (HTML)
 
 * Use env files for API configuration
 
 * May have future extension for sending email to manager via email.
 
-* Must be deploy ready without any hassle
+* Must be deploy ready without any hassle(Use docker. create docker file)
 
 URLS have ratelimiter cannot request authentication token each time. Must save in env.
 APIs Needed
@@ -58,12 +58,13 @@ APIs Needed
         projects:
         users:
 
-3. Projects (/projects, GET)
+3. Projects (/organizations/{id}/projects, GET)
     Retrieve projects
 
     Params:
         auth_token:
         app_token:
+        org_id:
         status: active/archived
 
 4. Organizations (/organizations, GET)
@@ -73,11 +74,12 @@ APIs Needed
         auth_token:
         app_token:
 
-5. Users (/user, GET)
+5. Users (/organizations/{id}/members, GET)
     Retrieve users
 
     Params:
         auth_token:
         app_token:
+        org_id:
         organization_memberships: Bool
         project_memberships: Bool
