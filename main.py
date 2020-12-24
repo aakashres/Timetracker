@@ -1,5 +1,6 @@
 import os
 import time
+import logging
 
 from pathlib import Path
 from dotenv import load_dotenv
@@ -10,6 +11,8 @@ from datetime import datetime, timedelta
 
 
 from api import tracker_api
+
+logging.basicConfig(filename='app.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 def save_output(data):
@@ -121,7 +124,7 @@ def main():
         data = format_data(data)
         save_output(data)
     except Exception as e:
-        print(e)
+        logging.error(e)
 
 
 if __name__ == "__main__":
