@@ -87,11 +87,9 @@ def get_data(tracker):
     org = tracker.get_organization()
     org_id = org[0]["id"]
     org_name = org[0]["name"]
-
     users = tracker.get_user_list(org_id)
     projects = tracker.get_project_list(org_id)
     activities = tracker.get_organization_activities(start_time, stop_time, organization_ids=[org[0]["id"]])
-
     data = {
         "users": users,
         "projects": projects,
@@ -118,10 +116,12 @@ def main():
             password=os.getenv("HUBSTAFF_PASSWORD")
         )
         os.environ["HUBSTAFF_AUTH_TOKEN"] = tracker.authenticate()
-
-    data = get_data(tracker)
-    data = format_data(data)
-    save_output(data)
+    try:
+        data = get_data(tracker)
+        data = format_data(data)
+        save_output(data)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
