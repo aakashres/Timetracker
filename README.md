@@ -33,3 +33,7 @@ Future extenstion in this script might be to feature to mail the generated outpu
 ```
 OUTPUT_MAIL_ADDRESS=sending_user@example.com
 ```
+
+Check output logs in ```/app/logs/app.logs``` for issues. If empty, script executed sucessfully.
+
+Check output in ```/app/output/timesheet.html```.
