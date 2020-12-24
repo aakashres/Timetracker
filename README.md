@@ -1,6 +1,6 @@
 # Timetracker/Timesheet generator
 
-A basic version of the script that fetches data from Hubstaff using Hubstaff API v1 generates a timesheet of any organization, ongoing project, active members, and time spent on the projects. It formats all data, compiles them, and saves them as output HTML. This project is based on Python==3.8, Hubstaff API v1, and some libraries mentioned in ```requirements.txt```.
+A basic version of the script that fetches data from Hubstaff using Hubstaff API v1 and generates a timesheet of any organization, ongoing project, active members, and time spent on the projects. It formats all data, compiles them, and saves them as output HTML. This project is based on Python==3.8, Hubstaff API v1, and some libraries mentioned in ```requirements.txt```.
 
 All necessary tokens and config are saved in the ```.env``` file inside the ```/app``` directory. Make sure that it is present before execution.
 
